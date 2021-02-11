@@ -113,6 +113,7 @@ import java.util.function.Function;
  * @param <V> the type of mapped values
  * @since 1.6
  */
+// 跳表的Java实现
 public class ConcurrentSkipListMap<K,V> extends AbstractMap<K,V>
     implements ConcurrentNavigableMap<K,V>, Cloneable, Serializable {
     /*
@@ -564,8 +565,8 @@ public class ConcurrentSkipListMap<K,V> extends AbstractMap<K,V>
      */
     static class Index<K,V> {
         final Node<K,V> node;
-        final Index<K,V> down;
-        volatile Index<K,V> right;
+        final Index<K,V> down; // 下索引
+        volatile Index<K,V> right; // 右索引
 
         /**
          * Creates index node with given values.
@@ -635,6 +636,11 @@ public class ConcurrentSkipListMap<K,V> extends AbstractMap<K,V>
 
     /**
      * Nodes heading each level keep track of their level.
+     */
+    /**
+     * 维护索引层次
+     * @param <K>
+     * @param <V>
      */
     static final class HeadIndex<K,V> extends Index<K,V> {
         final int level;
