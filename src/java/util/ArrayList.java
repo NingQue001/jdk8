@@ -130,6 +130,14 @@ public class ArrayList<E> extends AbstractList<E>
      * The capacity of the ArrayList is the length of this array buffer. Any
      * empty ArrayList with elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA
      * will be expanded to DEFAULT_CAPACITY when the first element is added.
+     *
+     * 序列化不直接使用elementData，ArrayList实现了具体的方法。
+     * 1 序列化时，调用writeObject(java.io.ObjectOutputStream s)，将size和element写入ObjectOutputStream
+     * 2 反序列化时，调用readObject(java.io.ObjectInputStream s)，从ObjectInputStream读取size和element，再恢复elementData
+     *
+     * 为什么要这么设计？
+     * 主要是因为elementData是一个缓存数组，会预留一些空间，等容量不足时再扩容，那么有些空间实际上就没有存储元素，采用上面的方法，则只序列化
+     * 实际存储的元素，而不是整个数据，节约了空间和时间
      */
     transient Object[] elementData; // non-private to simplify nested class access
 
@@ -250,11 +258,11 @@ public class ArrayList<E> extends AbstractList<E>
      * @param minCapacity the desired minimum capacity
      */
     private void grow(int minCapacity) {
-        // overflow-conscious code
+        // overflow-conscious code 有溢出意识的代码
         int oldCapacity = elementData.length; // 目前数组大小
         // 新容量为oldCapacity加上oldCapacity除以2（即>>右移位运算），这个是自动扩展数组大小的算法
         // 当newCapacity大于minCapacity时并且没有到达数组最大值，都会将数组扩展为newCapacity大小
-        int newCapacity = oldCapacity + (oldCapacity >> 1);
+        int newCapacity = oldCapacity + (oldCapacity >> 1); // 扩容1.5倍
         if (newCapacity - minCapacity < 0)
             newCapacity = minCapacity; // 如果newCapacity小于指定的minCapacity，newCapacity取minCapacity
         if (newCapacity - MAX_ARRAY_SIZE > 0)
